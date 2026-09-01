@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut, dialog, systemPreferences, shell } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const koffi = require('koffi');
@@ -64,7 +64,7 @@ function getNativeKeyboard() {
     createEvent: services.func('void *CGEventCreateKeyboardEvent(void *, uint16_t, bool)'),
     postEvent: services.func('void CGEventPost(uint32_t, void *)'),
     releaseEvent: core.func('void CFRelease(void *)'),
-    isTrusted: services.func('bool AXIsProcessTrusted()')
+    isTrusted: () => systemPreferences.isTrustedAccessibilityClient(false)
   };
   nativeKeyboard = {
     pressKey: (code, down) => {
@@ -185,6 +185,15 @@ function togglePause() {
   }
 }
 
+function requestAccessibilityPermission(openSettings = false) {
+  if (process.platform !== 'darwin') return true;
+  const trusted = systemPreferences.isTrustedAccessibilityClient(true);
+  if (!trusted && openSettings) {
+    shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility').catch(() => {});
+  }
+  return trusted;
+}
+
 function createWindow() {
   window = new BrowserWindow({
     width: 1060,
@@ -200,6 +209,9 @@ function createWindow() {
     }
   });
   window.loadFile('index.html');
+  window.webContents.once('did-finish-load', () => {
+    if (process.platform === 'darwin') setTimeout(() => requestAccessibilityPermission(false), 700);
+  });
 }
 
 function stopPlayback(reason = 'Stopped') {
@@ -240,10 +252,11 @@ async function startNativePlayer(payload) {
   }
 
   if (!keyboard.isTrusted()) {
+    requestAccessibilityPermission(true);
     window.show();
     window.webContents.send('playback-status', {
       state: 'error',
-      message: 'Accessibility permission is not enabled yet. Enable it, then quit and reopen the app.'
+      message: 'Roblox Piano Player was added to Accessibility. Enable its switch, return here, and press Play again.'
     });
     return;
   }
@@ -287,9 +300,11 @@ async function startMidiPlayer(payload) {
     return;
   }
   if (!keyboard.isTrusted()) {
+    requestAccessibilityPermission(true);
+    window.show();
     window.webContents.send('playback-status', {
       state: 'error',
-      message: 'Accessibility permission is not enabled yet. Enable it, then quit and reopen the app.'
+      message: 'Roblox Piano Player was added to Accessibility. Enable its switch, return here, and press Play again.'
     });
     return;
   }

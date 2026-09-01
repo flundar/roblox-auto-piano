@@ -1,6 +1,6 @@
 {
   "name": "roblox-piano-player",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Tempo-controlled Roblox piano sheet, MIDI, and audio player",
   "author": "Roblox Piano Player",
   "main": "main.js",

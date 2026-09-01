@@ -47,7 +47,7 @@ Only use this command for a copy downloaded from this project's official GitHub 
 
 ### macOS keyboard permission
 
-On first playback, enable **Roblox Piano Player** in **System Settings → Privacy & Security → Accessibility**. Then quit the app completely and reopen it.
+On first launch, the app automatically requests Accessibility access and opens the correct macOS permission flow. Enable the **Roblox Piano Player** switch in **System Settings → Privacy & Security → Accessibility**, return to the app, and press **Play** again. The app does not grant its own permission, and a restart is not required.
 
 ### Windows keyboard input
 
