@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox Piano Player</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <p class="eyebrow">AUTO PLAYER</p>
+        <h1>Roblox Piano</h1>
+        <p class="subtitle">Paste the notes, set the tempo, return to the game.</p>
+      </div>
+      <div class="status" id="status"><span></span><b>Ready</b></div>
+    </header>
+
+    <nav class="mode-switch" aria-label="Playback mode">
+      <button class="mode-button active" data-mode="sheet">Sheet text</button>
+      <button class="mode-button" data-mode="midi">MIDI file</button>
+      <button class="mode-button" data-mode="audio">MP3 → MIDI</button>
+    </nav>
+
+    <section class="panel editor-panel" id="sheetPanel">
+      <div class="panel-title">
+        <label for="sheet">Sheet text</label>
+        <button class="text-button" id="clearButton">Clear</button>
+      </div>
+      <textarea id="sheet" spellcheck="false" placeholder="Example: [se]-a-s-a-&#10;[sq]-o-s-i---"></textarea>
+      <div class="validation" id="validation">No notes entered yet.</div>
+    </section>
+
+    <section class="panel midi-panel hidden" id="midiPanel">
+      <div class="midi-icon">MIDI</div>
+      <div class="midi-copy">
+        <h2 id="midiName">Choose a MIDI file</h2>
+        <p id="midiInfo">.mid or .midi · tempo and chord timing are read from the file</p>
+      </div>
+      <button class="secondary midi-button" id="chooseMidiButton">Choose file</button>
+    </section>
+
+    <section class="panel midi-panel hidden" id="audioPanel">
+      <div class="midi-icon audio-icon">AI</div>
+      <div class="midi-copy">
+        <h2 id="audioName">Convert audio to piano MIDI</h2>
+        <p id="audioInfo">Spotify Basic Pitch · offline polyphonic note detection</p>
+      </div>
+      <div class="progress-track hidden" id="audioProgressTrack"><div id="audioProgressBar"></div></div>
+      <p class="progress-label hidden" id="audioProgressLabel"></p>
+      <div class="audio-actions">
+        <button class="secondary midi-button" id="chooseAudioButton">Choose audio file</button>
+        <button class="secondary midi-button hidden" id="saveMidiButton">Save MIDI</button>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="panel tempo-card" id="sheetTempoCard">
+        <label for="bpm">Tempo</label>
+        <div class="tempo-row">
+          <input id="bpm" type="range" min="30" max="300" value="120">
+          <div class="number-wrap"><input id="bpmNumber" type="number" min="30" max="300" value="120"><span>BPM</span></div>
+        </div>
+        <p>Each letter or chord is one subdivision.</p>
+      </div>
+
+      <div class="panel midi-controls hidden" id="midiControls">
+        <div>
+          <label for="midiSpeed">MIDI speed</label>
+          <select id="midiSpeed">
+            <option value="0.5">0.5×</option>
+            <option value="0.75">0.75×</option>
+            <option value="1" selected>1× (original)</option>
+            <option value="1.25">1.25×</option>
+            <option value="1.5">1.5×</option>
+            <option value="2">2×</option>
+          </select>
+        </div>
+        <div>
+          <label for="midiTranspose">Transpose</label>
+          <div class="number-wrap transpose-wrap"><input id="midiTranspose" type="number" min="-36" max="36" value="0"><span>semitones</span></div>
+        </div>
+        <div>
+          <label for="midiComplexity">Piano simplification</label>
+          <select id="midiComplexity">
+            <option value="original">Original</option>
+            <option value="balanced" selected>Balanced · up to 4</option>
+            <option value="simple">Simple · up to 3</option>
+            <option value="melodyBass">Melody + bass · up to 2</option>
+          </select>
+        </div>
+        <div>
+          <label for="midiHumanize">Humanize performance</label>
+          <select id="midiHumanize">
+            <option value="off">Off · fully mechanical</option>
+            <option value="subtle">Subtle</option>
+            <option value="natural" selected>Natural</option>
+            <option value="expressive">Expressive</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="panel settings-card">
+        <div id="divisionSetting">
+          <label for="division">Notes per beat</label>
+          <select id="division">
+            <option value="1">1 note</option>
+            <option value="2" selected>2 notes</option>
+            <option value="4">4 notes</option>
+          </select>
+        </div>
+        <div>
+          <label for="countdown">Countdown</label>
+          <select id="countdown">
+            <option value="0">None</option>
+            <option value="3" selected>3 seconds</option>
+            <option value="5">5 seconds</option>
+          </select>
+        </div>
+        <div>
+          <label for="hold">Key hold</label>
+          <select id="hold">
+            <option value="0.55">Short</option>
+            <option value="0.78" selected>Normal</option>
+            <option value="0.95">Long</option>
+          </select>
+        </div>
+        <div id="linePauseSetting">
+          <label for="linePause">Line break pause</label>
+          <select id="linePause">
+            <option value="0">Off</option>
+            <option value="0.5">½ beat</option>
+            <option value="1" selected>1 beat</option>
+            <option value="2">2 beats</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="action-row">
+      <div class="shortcut"><kbd>F1</kbd> pause / resume · <kbd>F2</kbd> stop</div>
+      <div class="buttons">
+        <button class="secondary" id="stopButton" disabled>Stop</button>
+        <button class="primary" id="playButton"><span>▶</span> Play</button>
+      </div>
+    </section>
+
+    <div class="notice" id="platformNotice">
+      <b>First use:</b> Enable Roblox Piano Player in System Settings → Privacy & Security → Accessibility. Then quit and reopen the app.
+    </div>
+  </main>
+  <script src="midi-utils.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
