@@ -33,7 +33,17 @@ npm run build:win
 
 Build output is written to the `dist` directory. The Windows package is a portable executable and does not require installation.
 
-Because the builds are not signed with Apple Developer or Microsoft code-signing certificates, macOS Gatekeeper or Windows SmartScreen may show a warning on first launch.
+The macOS builds use an ad-hoc signature and the Windows build is unsigned. macOS Gatekeeper or Windows SmartScreen may therefore show a warning on first launch.
+
+### Opening the macOS build
+
+The app is ad-hoc signed but is not Apple-notarized. On first launch, Control-click the app, choose **Open**, then confirm **Open**. If macOS still reports that the downloaded app is damaged, move it to **Applications** and run:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Roblox Piano Player.app"
+```
+
+Only use this command for a copy downloaded from this project's official GitHub release.
 
 ### macOS keyboard permission
 
